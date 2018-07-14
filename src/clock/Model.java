@@ -6,6 +6,7 @@ import java.util.Observable;
 
 public class Model extends Observable {
     
+    PriorityQueue<Alarms> q;
     int hour = 0;
     int minute = 0;
     int second = 0;
@@ -26,5 +27,17 @@ public class Model extends Observable {
             setChanged();
             notifyObservers();
         }
+    }
+    
+    public void add(){
+//    int alarm = Integer.parseInt(input.substring(input.lastIndexOf(' ')));
+//    Alarms person = new Alarms(alarm);
+//    int priority = Integer.parseInt(input.substring(input.lastIndexOf(' ') + 1));
+//    System.out.println("Adding " + person.getAlarm() + " with priority " + priority);
+//        try {
+//            q.add(alarm, priority);
+//        } catch (QueueOverflowException e) {
+//            System.out.println("Add operation failed: " + e);
+//        }
     }
 }

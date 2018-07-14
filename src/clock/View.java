@@ -4,14 +4,20 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import javax.swing.*;
 import java.util.Observer;
 import java.util.Observable;
+import javax.swing.text.MaskFormatter;
 
 public class View implements Observer {
     
+    private JDialog dialog = new JDialog();
+    private Label lb;
     ClockPanel panel;
+    PriorityQueue<Alarms> q;
+    JFormattedTextField Time  = null;
+    MaskFormatter timeFormatter  = null; 
+    
     
     public View(Model model) {
         JFrame frame = new JFrame();
@@ -19,24 +25,18 @@ public class View implements Observer {
         //frame.setContentPane(panel);
         frame.setTitle("Java Clock");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        
-        // I've just put a single button in each of the border positions:
-        // PAGE_START (i.e. top), PAGE_END (bottom), LINE_START (left) and
-        // LINE_END (right). You can omit any of these, or replace the button
-        // with something else like a label or a menu bar. Or maybe you can
-        // figure out how to pack more than one thing into one of those
-        // positions. This is the very simplest border layout possible, just
-        // to help you get started.
         
         //for holding the clock panel
         Container pane = frame.getContentPane();
-        
-        //for setting up the menu bar
+
+          //for setting up the menu bar
         JMenuBar menubar = new JMenuBar();
         
         //setting the name of the menu in the menubar
         JMenu menu = new JMenu("Alarm-Menu");
+                //for adding the menu bar to the frame
+        menubar.add(menu);
+        frame.setJMenuBar(menubar);
         
         //for adding items within the menu
         JMenuItem alarm = new JMenuItem("Set-Alarm");
@@ -44,7 +44,7 @@ public class View implements Observer {
         alarm.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ev) {
-              System.exit(0);
+                dialog();
             }
             });
         menu.add(alarm);
@@ -54,7 +54,7 @@ public class View implements Observer {
         savedalarm.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ev) {
-              System.exit(0);
+              
             }
             });
         menu.add(savedalarm);
@@ -65,7 +65,7 @@ public class View implements Observer {
         deletealarm.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ev) {
-              
+                
             }
             });
         menu.add(deletealarm);
@@ -76,15 +76,11 @@ public class View implements Observer {
         quit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ev) {
-              System.exit(0);
+                System.exit(0);
             }
             });
         menu.add(quit);
-
-        //for adding the menu bar to the frame
-        menubar.add(menu);
-        frame.setJMenuBar(menubar);
-        
+      
         //setting up the subpanel to hold the buttons
         JPanel subPanel = new JPanel();
         
@@ -94,7 +90,7 @@ public class View implements Observer {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-               
+                dialog();
             }
         });
         
@@ -103,7 +99,7 @@ public class View implements Observer {
         button2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-              //go to function to set alarms
+              //calls a function to show a dialog box ("printing the queue") of all saved alarms
             }
         });
         
@@ -112,7 +108,8 @@ public class View implements Observer {
         button3.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-              //go to function to set alarms
+              //a pop-up dialog to allow the user to delete a alarm
+              
             }
         });
         
@@ -124,7 +121,7 @@ public class View implements Observer {
         //sub panel for inserting multiple buttons beside the clock
         subPanel.setPreferredSize(new Dimension(150, 150));
         pane.add(subPanel, BorderLayout.LINE_START);
-  
+        
         //size of the main clock panel
         panel.setPreferredSize(new Dimension(275, 275));
         pane.add(panel, BorderLayout.CENTER);
@@ -133,11 +130,51 @@ public class View implements Observer {
         frame.pack();
         frame.setVisible(true);
     }
-    
+
     //updates the sizing of the window of the program.
     @Override
     public void update(Observable o, Object arg) {
         panel.repaint();
+    }
+ 
+    public void dialog(){
+            JPanel SApanel = new JPanel();
+            lb = new Label("Input Alarm Below");
+            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            dialog.setModal(true);
+            
+            JTextField textfield = new JTextField(10);
+            SApanel.add(textfield);
+            
+            //adds a save alarm button to the frame
+            JButton saveButton  = new JButton("Save Alarm");
+            SApanel.add(saveButton, BorderLayout.SOUTH);
+            saveButton.setPreferredSize(new Dimension(100, 100));
+            saveButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                q = new UnsortedListqueue<>(8);
+                }
+            });
+
+            //adds a close button to the frame
+            JButton closeButton  = new JButton("Close");
+            SApanel.add(closeButton, BorderLayout.SOUTH);
+            closeButton.setPreferredSize(new Dimension(100, 100));
+            closeButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                dialog.dispose();
+                }
+            });
+            
+            dialog.add(SApanel, BorderLayout.CENTER);
+            dialog.add(lb, BorderLayout.NORTH);
+        
+            dialog.pack();
+            dialog.setLocation(200, 200);
+            dialog.setTitle("Set Alarm");
+            dialog.setVisible(true);
     }
     
 }

@@ -1,4 +1,4 @@
-package queuemanager;
+package clock;
 
 /**
  * Queue is empty.
