@@ -29,15 +29,17 @@ public class Model extends Observable {
         }
     }
     
-    public void add(){
-//    int alarm = Integer.parseInt(input.substring(input.lastIndexOf(' ')));
-//    Alarms person = new Alarms(alarm);
-//    int priority = Integer.parseInt(input.substring(input.lastIndexOf(' ') + 1));
-//    System.out.println("Adding " + person.getAlarm() + " with priority " + priority);
-//        try {
-//            q.add(alarm, priority);
-//        } catch (QueueOverflowException e) {
-//            System.out.println("Add operation failed: " + e);
-//        }
+    public void add() throws QueueOverflowException{
+        int priority = 0;
+        Alarms alarm = new Alarms(hour,minute,second);
+        priority++;
+        System.out.println("Adding " + alarm.getAlarm() + " with priority " + priority);
+        try {
+            q.add(alarm, priority);
+        } catch (QueueOverflowException e) {
+            System.out.println("Add operation failed: " + e);
+        }
+
     }
+    
 }
