@@ -7,21 +7,15 @@ import java.awt.event.InputEvent;
 import javax.swing.*;
 import java.util.Observer;
 import java.util.Observable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.text.MaskFormatter;
+
 
 public class View implements Observer {
     
-    private JDialog dialog = new JDialog();
-    private Label lb;
+    Label lb;
     ClockPanel panel;
     
     PriorityQueue<Alarms> q;
-    JFormattedTextField Time  = null;
-    MaskFormatter timeFormatter  = null; 
-    
-    
+
     public View(Model model) {
         JFrame frame = new JFrame();
         panel = new ClockPanel(model);
@@ -52,26 +46,15 @@ public class View implements Observer {
             });
         menu.add(alarm);
         
-        JMenuItem savedalarm = new JMenuItem("Saved Alarms");
+        JMenuItem savedalarm = new JMenuItem("Edit Alarms");
         savedalarm.setAccelerator(KeyStroke.getKeyStroke('S',InputEvent.CTRL_MASK));
         savedalarm.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ev) {
-              SavedDialog();
+              EditDialog();
             }
             });
         menu.add(savedalarm);
-        
-        //menu item to delete any exsisting alarms, if none exsist then will popiup with a message.
-        JMenuItem deletealarm = new JMenuItem("Delete Alarm");
-        deletealarm.setAccelerator(KeyStroke.getKeyStroke('D',InputEvent.CTRL_MASK));
-        deletealarm.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ev) {
-                DeleteDialog();
-            }
-            });
-        menu.add(deletealarm);
         
         //menu item to quit the program
         JMenuItem quit = new JMenuItem("Quit Program");
@@ -87,7 +70,7 @@ public class View implements Observer {
         //setting up the subpanel to hold the buttons
         JPanel subPanel = new JPanel();
         
-        //For setting up buttons on the inital panel with sizing and text.
+        //Adds a button to make new alarms
         JButton button = new JButton("Set Alarm");
         button.setPreferredSize(new Dimension(150, 75));
         button.addActionListener(new ActionListener() {
@@ -97,30 +80,19 @@ public class View implements Observer {
             }
         });
         
-        JButton button2 = new JButton("Saved ALarms");
+        JButton button2 = new JButton("Edit ALarms");
         button2.setPreferredSize(new Dimension(150, 75));
         button2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-              //calls a function to show a dialog box ("printing the queue") of all saved alarms
-              SavedDialog();
-            }
-        });
-        
-        JButton button3 = new JButton("Delete Alarms");
-        button3.setPreferredSize(new Dimension(150, 75));
-        button3.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-              //a pop-up dialog to allow the user to delete a alarm
-              DeleteDialog();
+              //calls a new dialog to be created for the user to edit all current alarms
+              EditDialog();
             }
         });
         
         //adds the buttons to the subpanel
         subPanel.add(button);
         subPanel.add(button2);      
-        subPanel.add(button3);
         
         //sub panel for inserting multiple buttons beside the clock
         subPanel.setPreferredSize(new Dimension(150, 150));
@@ -143,6 +115,7 @@ public class View implements Observer {
  
     //method for saving alarms through a dialog.
     public void Savedialog(){
+        final JDialog dialog = new JDialog();
         int priority = 0;
         JPanel SApanel = new JPanel();
         lb = new Label("Input Alarm Below");
@@ -164,7 +137,7 @@ public class View implements Observer {
         sspinner.setBounds(100,100,50,30);    
         SApanel.add(sspinner, BorderLayout.CENTER);  
             
-        //adds a save alarm button to the frame
+        //adds a save alarm button 
         JButton saveButton  = new JButton("Save Alarm");
         SApanel.add(saveButton, BorderLayout.SOUTH);
         saveButton.setPreferredSize(new Dimension(100, 50));
@@ -194,7 +167,7 @@ public class View implements Observer {
             }
         });
 
-        //adds a close button to the frame
+        //adds a close button
         JButton closeButton  = new JButton("Close");
         SApanel.add(closeButton, BorderLayout.SOUTH);
         closeButton.setPreferredSize(new Dimension(100, 50));
@@ -214,71 +187,59 @@ public class View implements Observer {
         dialog.setVisible(true);
     }
     
-    //method for displaying a disalog to delete any saved alarms
-    public void DeleteDialog(){
-        JPanel SApanel = new JPanel();
-        lb = new Label("Select alarm to remove");
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialog.setModal(true);
-            
-        //adds a save alarm button to the frame
-        JButton saveButton  = new JButton("Confirm Delete");
-        SApanel.add(saveButton, BorderLayout.SOUTH);
-        saveButton.setPreferredSize(new Dimension(100, 100));
-        saveButton.addActionListener(new ActionListener() {
+        //method for Editing all current alarms
+        public void EditDialog(){
+        q = new UnsortedListqueue<>(8);
+        JPanel Epanel = new JPanel();
+        final JDialog dialog2 = new JDialog();
+        lb = new Label("Edit your alarm below");
+        dialog2.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog2.setModal(true);
+        
+        JList list = new JList();
+        list.setVisibleRowCount(5);
+        Epanel.add(list, BorderLayout.CENTER);
+        Epanel.add(new JScrollPane(list));
+
+        //adds a edit button
+        JButton editButton  = new JButton("Edit");
+        Epanel.add(editButton, BorderLayout.SOUTH);
+        editButton.setPreferredSize(new Dimension(100, 50));
+        editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                q = new UnsortedListqueue<>(8);
+                dialog2.dispose();
             }
         });
-
-        //adds a close button to the frame
+        
+        //adds a Delete button
+        JButton deleteButton  = new JButton("Delete");
+        Epanel.add(deleteButton, BorderLayout.SOUTH);
+        deleteButton.setPreferredSize(new Dimension(100, 50));
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                dialog2.dispose();
+            }
+        });
+            
+        //adds a close button
         JButton closeButton  = new JButton("Close");
-        SApanel.add(closeButton, BorderLayout.SOUTH);
-        closeButton.setPreferredSize(new Dimension(100, 100));
+        Epanel.add(closeButton, BorderLayout.SOUTH);
+        closeButton.setPreferredSize(new Dimension(100, 50));
         closeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                dialog.dispose();
+                dialog2.dispose();
             }
         });
-            
-        dialog.add(SApanel, BorderLayout.CENTER);
-        dialog.add(lb, BorderLayout.PAGE_START);
         
-        dialog.pack();
-        dialog.setLocation(200, 200);
-        dialog.setTitle("Remove Alarm");
-        dialog.setVisible(true);
-    }
-    
-        //method for displaying all current alarms if any exsist
-        public void SavedDialog(){
-            JPanel SApanel = new JPanel();
-            lb = new Label("All current alarms below");
-            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            dialog.setModal(true);
-            
-            JTextField textfield = new JTextField(10);
-            SApanel.add(textfield, BorderLayout.CENTER);
-
-            //adds a close button to the frame
-            JButton closeButton  = new JButton("Close");
-            SApanel.add(closeButton, BorderLayout.SOUTH);
-            closeButton.setPreferredSize(new Dimension(100, 100));
-            closeButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                dialog.dispose();
-                }
-            });
-            
-            dialog.add(SApanel, BorderLayout.CENTER);
-            dialog.add(lb, BorderLayout.NORTH);
-        
-            dialog.pack();
-            dialog.setLocation(200, 200);
-            dialog.setTitle("Currently saved alarms");
-            dialog.setVisible(true);
+        dialog2.setPreferredSize(new Dimension(300, 200));
+        dialog2.add(Epanel, BorderLayout.CENTER);
+        dialog2.add(lb, BorderLayout.NORTH);
+        dialog2.pack();
+        dialog2.setLocation(200, 200);
+        dialog2.setTitle("Edit personal alarm");
+        dialog2.setVisible(true);
     }
 }
