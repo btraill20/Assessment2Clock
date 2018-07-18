@@ -80,7 +80,7 @@ public class View implements Observer {
             }
         });
         
-        JButton button2 = new JButton("Edit ALarms");
+        JButton button2 = new JButton("Edit Alarms");
         button2.setPreferredSize(new Dimension(150, 75));
         button2.addActionListener(new ActionListener() {
             @Override
@@ -90,9 +90,20 @@ public class View implements Observer {
             }
         });
         
+        JButton button3 = new JButton("Exit");
+        button3.setPreferredSize(new Dimension(150, 75));
+        button3.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+              //exits the program
+              System.exit(0);
+            }
+        });
+        
         //adds the buttons to the subpanel
         subPanel.add(button);
-        subPanel.add(button2);      
+        subPanel.add(button2);
+        subPanel.add(button3); 
         
         //sub panel for inserting multiple buttons beside the clock
         subPanel.setPreferredSize(new Dimension(150, 150));
@@ -116,7 +127,6 @@ public class View implements Observer {
     //method for saving alarms through a dialog.
     public void Savedialog(){
         final JDialog dialog = new JDialog();
-        int priority = 0;
         JPanel SApanel = new JPanel();
         lb = new Label("Input Alarm Below");
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -196,8 +206,11 @@ public class View implements Observer {
         dialog2.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog2.setModal(true);
         
-        JList list = new JList();
+        final JList list = new JList();
+        list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         list.setVisibleRowCount(5);
+        JScrollPane listScroller = new JScrollPane(list);
+        listScroller.setPreferredSize(new Dimension(250, 80));
         Epanel.add(list, BorderLayout.CENTER);
         Epanel.add(new JScrollPane(list));
 
@@ -208,7 +221,7 @@ public class View implements Observer {
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                dialog2.dispose();
+                editalarm();
             }
         });
         
@@ -219,7 +232,14 @@ public class View implements Observer {
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                dialog2.dispose();
+                q = new UnsortedListqueue<>(8);
+                try {
+                    String name = q.head().getAlarm();
+                    System.out.println("Removing " + name + " from the head of the queue");
+                    q.remove();
+                } catch (QueueUnderflowException e) {
+                    System.out.println("Can't remove head of queue: " + e);
+                }
             }
         });
             
@@ -241,5 +261,80 @@ public class View implements Observer {
         dialog2.setLocation(200, 200);
         dialog2.setTitle("Edit personal alarm");
         dialog2.setVisible(true);
+    }
+ 
+    //inner dialog for changing alarms already made.
+    public void editalarm(){
+        JPanel pane = new JPanel();
+        final JDialog innerdialog = new JDialog();
+        lb = new Label("Change your saved alarm below or cancel");
+        Label label = new Label("select new time for your alarm");
+        innerdialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        innerdialog.setModal(true);
+
+        final SpinnerModel hour =  new SpinnerNumberModel (12, 0, 23, 1); 
+        final JSpinner hspinner = new JSpinner(hour);   
+        hspinner.setBounds(100,100,50,30);    
+        pane.add(hspinner, BorderLayout.CENTER); 
+            
+        final SpinnerModel minute =  new SpinnerNumberModel (1, 1, 60, 1); 
+        final JSpinner mspinner = new JSpinner(minute);   
+        mspinner.setBounds(100,100,50,30);    
+        pane.add(mspinner, BorderLayout.CENTER);    
+            
+        final SpinnerModel second =  new SpinnerNumberModel (1, 1, 60, 1); 
+        final JSpinner sspinner = new JSpinner(second);   
+        sspinner.setBounds(100,100,50,30);    
+        pane.add(sspinner, BorderLayout.CENTER);  
+        
+        //adds a save alarm button 
+        JButton saveButton  = new JButton("Save Alarm");
+        pane.add(saveButton, BorderLayout.SOUTH);
+        saveButton.setPreferredSize(new Dimension(100, 50));
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                q = new UnsortedListqueue<>(8);
+                Object o1 = hspinner.getValue();
+                Object o2 = mspinner.getValue();
+                Object o3 = sspinner.getValue();
+                Number n1 = (Number) o1;
+                Number n2 = (Number) o2;
+                Number n3 = (Number) o3;
+                int i1 = n1.intValue();
+                int i2 = n2.intValue();
+                int i3 = n3.intValue();
+                Alarms alarm = new Alarms(i1,i2,i3);
+                //need to review priority increment as it sets all alarms at priority 1
+                int Pvalue = 0;
+                int priority = ++Pvalue;
+                System.out.println("Adding " + alarm.getAlarm() + " with priority " + priority);
+                try {
+                    q.add(alarm, priority);
+                } catch (QueueOverflowException e) {
+                    System.out.println("Add operation failed: " + e);
+                }
+            }
+        });
+            
+        //adds a close button
+        JButton closeButton  = new JButton("Cancel");
+        pane.add(closeButton, BorderLayout.SOUTH);
+        closeButton.setPreferredSize(new Dimension(100, 50));
+        closeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                innerdialog.dispose();
+            }
+        });
+        
+        innerdialog.setPreferredSize(new Dimension(250, 200));
+        innerdialog.add(pane, BorderLayout.CENTER);
+        innerdialog.add(lb, BorderLayout.NORTH);
+        innerdialog.add(label, BorderLayout.NORTH);
+        innerdialog.pack();
+        innerdialog.setLocation(200, 200);
+        innerdialog.setTitle("Edit Personal Alarm");
+        innerdialog.setVisible(true);
     }
 }
