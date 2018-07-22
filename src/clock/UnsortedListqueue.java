@@ -6,7 +6,8 @@ public class UnsortedListqueue <T>  implements PriorityQueue<T>{
    private Nodes<T> top;
 
    //function used to determine the size of the list
-    private int size()
+   @Override
+    public int size()
     {
         Nodes<T> node = top;
         int result = 0;
@@ -71,7 +72,7 @@ public class UnsortedListqueue <T>  implements PriorityQueue<T>{
     
     @Override
     public String toString() {
-        String result = "Sorted Linked list size =" + size();
+        String result = "size:"+size();
         result += ", contents = [";
                 for(Nodes<T> node = top; node != null; node = node.getNext())
                 {

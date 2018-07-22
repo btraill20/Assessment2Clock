@@ -12,11 +12,13 @@ import java.util.Observable;
 public class View implements Observer {
     
     Label lb;
+    JLabel l;
     ClockPanel panel;
     
     PriorityQueue<Alarms> q;
 
     public View(Model model) {
+        q = new UnsortedListqueue<>(8);
         JFrame frame = new JFrame();
         panel = new ClockPanel(model);
         //frame.setContentPane(panel);
@@ -72,7 +74,10 @@ public class View implements Observer {
         
         //Adds a button to make new alarms
         JButton button = new JButton("Set Alarm");
-        button.setPreferredSize(new Dimension(150, 75));
+        button.setBackground(new Color(59, 89, 182));
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Courier New", Font.PLAIN, 12));
+        button.setPreferredSize(new Dimension(150, 50));
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -81,7 +86,10 @@ public class View implements Observer {
         });
         
         JButton button2 = new JButton("Edit Alarms");
-        button2.setPreferredSize(new Dimension(150, 75));
+        button2.setBackground(new Color(59, 89, 182));
+        button2.setForeground(Color.WHITE);
+        button2.setFont(new Font("Courier New", Font.PLAIN, 12));
+        button2.setPreferredSize(new Dimension(150, 50));
         button2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -91,7 +99,10 @@ public class View implements Observer {
         });
         
         JButton button3 = new JButton("Exit");
-        button3.setPreferredSize(new Dimension(150, 75));
+        button3.setBackground(new Color(59, 89, 182));
+        button3.setForeground(Color.WHITE);
+        button3.setFont(new Font("Courier New", Font.PLAIN, 12));
+        button3.setPreferredSize(new Dimension(150, 50));
         button3.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -110,14 +121,24 @@ public class View implements Observer {
         pane.add(subPanel, BorderLayout.LINE_START);
         
         //size of the main clock panel
-        panel.setPreferredSize(new Dimension(275, 275));
+        panel.setPreferredSize(new Dimension(300, 200));
         pane.add(panel, BorderLayout.CENTER);
 
-        //makes the frame visible
+        //sets up a panel for the label to show the amount of saved alarms
+        JPanel labelpane = new JPanel();
+        l = new JLabel("Number of saved alarms:"+q.size()); 
+        l.setFont(new Font("Courier New", Font.ITALIC, 12));
+        l.setPreferredSize(new Dimension(175, 50));
+        l.setForeground(Color.blue);
+        labelpane.add(l);
+        pane.add(labelpane,BorderLayout.SOUTH);
+        
+        //makes the frame visible and location
+        frame.setLocation(100, 100);
         frame.pack();
         frame.setVisible(true);
     }
-
+    
     //updates the sizing of the window of the program.
     @Override
     public void update(Observable o, Object arg) {
@@ -171,6 +192,7 @@ public class View implements Observer {
                 System.out.println("Adding " + alarm.getAlarm() + " with priority " + priority);
                 try {
                     q.add(alarm, priority);
+                    dialog.dispose();
                 } catch (QueueOverflowException e) {
                     System.out.println("Add operation failed: " + e);
                 }
@@ -206,36 +228,41 @@ public class View implements Observer {
         dialog2.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog2.setModal(true);
         
-        final JList list = new JList();
+        DefaultListModel<String> model = new DefaultListModel<>();
+        model.addElement(toString());
+        final JList<String> list = new JList<>(model);
+        
         list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         list.setVisibleRowCount(5);
+        list.setPreferredSize(new Dimension(200,100));
+        
         JScrollPane listScroller = new JScrollPane(list);
-        listScroller.setPreferredSize(new Dimension(250, 80));
+        listScroller.setPreferredSize(new Dimension(100, 80));
         Epanel.add(list, BorderLayout.CENTER);
         Epanel.add(new JScrollPane(list));
 
         //adds a edit button
         JButton editButton  = new JButton("Edit");
         Epanel.add(editButton, BorderLayout.SOUTH);
-        editButton.setPreferredSize(new Dimension(100, 50));
+        editButton.setPreferredSize(new Dimension(75, 50));
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                editalarm();
+                editalarmdialog();
             }
         });
         
         //adds a Delete button
         JButton deleteButton  = new JButton("Delete");
         Epanel.add(deleteButton, BorderLayout.SOUTH);
-        deleteButton.setPreferredSize(new Dimension(100, 50));
+        deleteButton.setPreferredSize(new Dimension(75, 50));
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 q = new UnsortedListqueue<>(8);
                 try {
-                    String name = q.head().getAlarm();
-                    System.out.println("Removing " + name + " from the head of the queue");
+                    String time = q.head().getAlarm();
+                    System.out.println("Removing " + time + " from the head of the queue");
                     q.remove();
                 } catch (QueueUnderflowException e) {
                     System.out.println("Can't remove head of queue: " + e);
@@ -246,7 +273,7 @@ public class View implements Observer {
         //adds a close button
         JButton closeButton  = new JButton("Close");
         Epanel.add(closeButton, BorderLayout.SOUTH);
-        closeButton.setPreferredSize(new Dimension(100, 50));
+        closeButton.setPreferredSize(new Dimension(75, 50));
         closeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -254,7 +281,7 @@ public class View implements Observer {
             }
         });
         
-        dialog2.setPreferredSize(new Dimension(300, 200));
+        dialog2.setPreferredSize(new Dimension(400, 250));
         dialog2.add(Epanel, BorderLayout.CENTER);
         dialog2.add(lb, BorderLayout.NORTH);
         dialog2.pack();
@@ -264,7 +291,7 @@ public class View implements Observer {
     }
  
     //inner dialog for changing alarms already made.
-    public void editalarm(){
+    public void editalarmdialog(){
         JPanel pane = new JPanel();
         final JDialog innerdialog = new JDialog();
         lb = new Label("Change your saved alarm below or cancel");
@@ -311,6 +338,7 @@ public class View implements Observer {
                 System.out.println("Adding " + alarm.getAlarm() + " with priority " + priority);
                 try {
                     q.add(alarm, priority);
+                    innerdialog.dispose();
                 } catch (QueueOverflowException e) {
                     System.out.println("Add operation failed: " + e);
                 }
@@ -337,4 +365,5 @@ public class View implements Observer {
         innerdialog.setTitle("Edit Personal Alarm");
         innerdialog.setVisible(true);
     }
+   
 }

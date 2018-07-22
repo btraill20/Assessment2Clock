@@ -27,4 +27,6 @@ public interface PriorityQueue<T> {
 
     @Override
     public String toString();
+    
+    public int size();
 }
