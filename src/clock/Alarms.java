@@ -1,26 +1,31 @@
 package clock;
 
-public class Alarms {
-    protected String Alarm;
+//@param <T>
+public class Alarms<T> {
+    
     protected int hour;
     protected int minute;
     protected int second;
 
+
     public Alarms(int hour, int minute, int second) {
+
         this.hour = hour;
         this.minute = minute;
         this.second = second;
     }
-
-    public String getAlarm() {
-        StringBuilder sb= new StringBuilder();
-        sb.append(hour).append(":").append(+minute).append(":").append(+second);
-        Alarm = sb.toString();
-        return Alarm;
+    
+    public int getHour(){
+    return hour;
     }
     
-    public String toOutput() {
-        return getAlarm();
+    public int getMinute(){
+    return minute;
     }
+    
+    public int getSecond(){
+    return second;
+    }
+    
 }
 

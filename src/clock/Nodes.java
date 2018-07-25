@@ -4,18 +4,30 @@ package clock;
 public class Nodes<T>
 {
     //this class is for setting up nodes, and their next node.
-    private final T item;
+    
+    protected int hour;
+    protected int minute;
+    protected int second;
     public Nodes<T> next;
     
-    public Nodes(T item, Nodes<T> next)
+    public Nodes(int hour,int minute,int second, Nodes<T> next)
     {
-        this.item = item;
+        this.hour = hour;
+        this.minute = minute;
+        this.second = second;
         this.next = next;
     }
     
-    public T getItem()
-    {
-        return item;
+    public int getHour(){
+    return hour;
+    }
+    
+    public int getMinute(){
+    return minute;
+    }
+    
+    public int getSecond(){
+    return second;
     }
     
     public Nodes<T> getNext()

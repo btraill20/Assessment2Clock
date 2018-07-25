@@ -25,4 +25,14 @@ public class Controller {
         timer = new Timer(100, listener);
         timer.start();
     }
+    
+    //used to play an alarm
+    public void alarm(){
+    
+    }
+    
+    //used to stop the alarm once the alarm has run.
+    public void stopalarm(){
+    
+    }
 }

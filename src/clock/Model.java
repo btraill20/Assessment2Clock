@@ -28,18 +28,5 @@ public class Model extends Observable {
             notifyObservers();
         }
     }
-    
-    public void add() throws QueueOverflowException{
-        int priority = 0;
-        Alarms alarm = new Alarms(hour,minute,second);
-        priority++;
-        System.out.println("Adding " + alarm.getAlarm() + " with priority " + priority);
-        try {
-            q.add(alarm, priority);
-        } catch (QueueOverflowException e) {
-            System.out.println("Add operation failed: " + e);
-        }
 
-    }
-    
 }

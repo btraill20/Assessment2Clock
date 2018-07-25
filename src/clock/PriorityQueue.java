@@ -5,19 +5,14 @@ package clock;
 public interface PriorityQueue<T> {
 
     /**
-     * @param item
+     * @param hour
+     * @param minute
+     * @param second
      * @param priority
      * @throws QueueOverflowException
      */
-    public void add(T item, int priority) throws QueueOverflowException;
+    public void add(int hour,int minute,int second, int priority) throws QueueOverflowException;
 
-
-    //@return The item with the highest priority
-    //@throws QueueUnderflowException
-
-    public T head() throws QueueUnderflowException;
-
-    //@throws QueueUnderflowException
 
     public void remove() throws QueueUnderflowException;
 
