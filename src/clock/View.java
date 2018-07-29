@@ -8,7 +8,9 @@ import javax.swing.*;
 import java.util.Observer;
 import java.util.Observable;
 
-
+/*
+*view is the visual representation of data that the model contains as well as what the user sees.
+*/
 public class View implements Observer {
     
     Label lb;
@@ -18,7 +20,8 @@ public class View implements Observer {
     PriorityQueue<Alarms> q;
 
     public View(Model model) {
-        q = new Listqueue<>(8);
+        //set list size to 24 for the hours in a single day
+        q = new Model<>(24);
         JFrame frame = new JFrame();
         panel = new ClockPanel(model);
         //frame.setContentPane(panel);
@@ -28,7 +31,7 @@ public class View implements Observer {
         //for holding the clock panel
         Container pane = frame.getContentPane();
 
-          //for setting up the menu bar
+        //for setting up the menu bar
         JMenuBar menubar = new JMenuBar();
         
         //setting the name of the menu in the menubar
@@ -127,7 +130,7 @@ public class View implements Observer {
         //sets up a panel for the label to show the amount of saved alarms
         JPanel labelpane = new JPanel();
         labelpane.setBorder(BorderFactory.createLineBorder(Color.black));
-        l = new JLabel("Number of saved alarms:"+q.size()); 
+        l = new JLabel("Number of saved alarms:0"); 
         l.setFont(new Font("Courier New", Font.ITALIC, 12));
         l.setPreferredSize(new Dimension(175, 50));
         l.setForeground(Color.blue);
@@ -139,7 +142,7 @@ public class View implements Observer {
         public void actionPerformed(ActionEvent actionEvent) {
             l.setText("Number of saved alarms:"+q.size());
         }
-    };
+    }; 
     Timer timer = new Timer(1000, actionListener);
     timer.start();
         
@@ -150,11 +153,15 @@ public class View implements Observer {
         frame.setVisible(true);
     }
     
-    //updates the sizing of the window of the program.
-    @Override
-    public void update(Observable o, Object arg) {
-        panel.repaint();
-    }
+            public JLabel getLabel() {
+                return l;
+            }
+    
+            //updates the sizing of the window of the program.
+            @Override
+            public void update(Observable o, Object arg) {
+                panel.repaint();
+            }
  
     //method for saving alarms through a dialog.
     public void Savedialog(){
@@ -189,7 +196,6 @@ public class View implements Observer {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                q = new Listqueue<>(8);
                 Object o1 = hspinner.getValue();
                 Object o2 = mspinner.getValue();
                 Object o3 = sspinner.getValue();
@@ -231,14 +237,13 @@ public class View implements Observer {
         dialog.add(SApanel, BorderLayout.CENTER);
         dialog.add(lb, BorderLayout.NORTH);
         dialog.pack();
-        dialog.setLocation(200, 200);
+        dialog.setLocation(100, 200);
         dialog.setTitle("Set Alarm");
         dialog.setVisible(true);
     }
     
         //method for Editing all current alarms
         public void EditDialog(){
-        q = new Listqueue<>(8);
         JPanel Epanel = new JPanel();
         final JDialog dialog2 = new JDialog();
         lb = new Label("Edit your alarm below");
@@ -282,7 +287,6 @@ public class View implements Observer {
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                q = new Listqueue<>(8);
                 try {
                     q.remove();
                 } catch (QueueUnderflowException e) {
@@ -309,7 +313,7 @@ public class View implements Observer {
         dialog2.add(Epanel, BorderLayout.CENTER);
         dialog2.add(lb, BorderLayout.NORTH);
         dialog2.pack();
-        dialog2.setLocation(200, 200);
+        dialog2.setLocation(300, 200);
         dialog2.setTitle("Edit personal alarm");
         dialog2.setVisible(true);
     }
@@ -348,7 +352,6 @@ public class View implements Observer {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                q = new Listqueue<>(8);
                 Object o1 = hspinner.getValue();
                 Object o2 = mspinner.getValue();
                 Object o3 = sspinner.getValue();
@@ -391,7 +394,7 @@ public class View implements Observer {
         innerdialog.add(lb, BorderLayout.NORTH);
         innerdialog.add(label, BorderLayout.NORTH);
         innerdialog.pack();
-        innerdialog.setLocation(400, 200);
+        innerdialog.setLocation(500, 200);
         innerdialog.setTitle("Edit Personal Alarm");
         innerdialog.setVisible(true);
     }
