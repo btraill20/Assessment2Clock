@@ -18,7 +18,9 @@ public class View implements Observer {
     ClockPanel panel;
     
     PriorityQueue<Alarms> q;
-
+    
+    int priority = 0;
+    
     public View(Model model) {
         //set list size to 24 for the hours in a single day
         q = new Model<>(24);
@@ -140,6 +142,7 @@ public class View implements Observer {
     ActionListener actionListener = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            //current issue with this, seems to repeat in a loop without stopping.
             l.setText("Number of saved alarms:"+q.size());
         }
     }; 
@@ -152,11 +155,7 @@ public class View implements Observer {
         frame.pack();
         frame.setVisible(true);
     }
-    
-            public JLabel getLabel() {
-                return l;
-            }
-    
+
             //updates the sizing of the window of the program.
             @Override
             public void update(Observable o, Object arg) {
@@ -206,9 +205,7 @@ public class View implements Observer {
                 int minute = n2.intValue();
                 int second = n3.intValue();
                 Alarms alarm = new Alarms(hour,minute,second);
-                //need to review priority increment as it sets all alarms at priority 1
-                int Pvalue = 0;
-                int priority = ++Pvalue;
+                priority = priority +1;
                 System.out.println("Adding " + alarm.getHour() + ":" + alarm.getMinute() + ":" + alarm.getSecond() + " with priority " + priority);
                 try {
                     q.add(hour,minute,second,priority);
@@ -245,6 +242,7 @@ public class View implements Observer {
         //method for Editing all current alarms
         public void EditDialog(){
         JPanel Epanel = new JPanel();
+        JPanel subPanel = new JPanel();
         final JDialog dialog2 = new JDialog();
         lb = new Label("Edit your alarm below");
         dialog2.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -252,24 +250,26 @@ public class View implements Observer {
         
         DefaultListModel<String> model = new DefaultListModel<>();
         model.addElement(q.toString());
-        final JList<String> list = new JList<>(model);
+        JList<String> list = new JList<>(model);
         
         list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        list.setLayoutOrientation(JList.VERTICAL);
         list.setVisibleRowCount(5);
-        list.setPreferredSize(new Dimension(250,100));
+        list.setPreferredSize(new Dimension(200, 100));
         
         JScrollPane listScroller = new JScrollPane(list);
         listScroller.setPreferredSize(new Dimension(100, 80));
         Epanel.add(list, BorderLayout.CENTER);
         Epanel.add(new JScrollPane(list));
 
+
         //adds a edit button
         JButton editButton  = new JButton("Edit");
         editButton.setBackground(new Color(59, 89, 182));
         editButton.setForeground(Color.WHITE);
         editButton.setFont(new Font("Courier New", Font.PLAIN, 12));
-        Epanel.add(editButton, BorderLayout.SOUTH);
-        editButton.setPreferredSize(new Dimension(150, 50));
+        subPanel.add(editButton, BorderLayout.SOUTH);
+        editButton.setPreferredSize(new Dimension(100, 50));
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -282,8 +282,8 @@ public class View implements Observer {
         deleteButton.setBackground(new Color(59, 89, 182));
         deleteButton.setForeground(Color.WHITE);
         deleteButton.setFont(new Font("Courier New", Font.PLAIN, 12));
-        Epanel.add(deleteButton, BorderLayout.SOUTH);
-        deleteButton.setPreferredSize(new Dimension(150, 50));
+        subPanel.add(deleteButton, BorderLayout.SOUTH);
+        deleteButton.setPreferredSize(new Dimension(100, 50));
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -300,8 +300,8 @@ public class View implements Observer {
         closeButton.setBackground(new Color(59, 89, 182));
         closeButton.setForeground(Color.WHITE);
         closeButton.setFont(new Font("Courier New", Font.PLAIN, 12));
-        Epanel.add(closeButton, BorderLayout.SOUTH);
-        closeButton.setPreferredSize(new Dimension(150, 50));
+        subPanel.add(closeButton, BorderLayout.SOUTH);
+        closeButton.setPreferredSize(new Dimension(100, 50));
         closeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -311,9 +311,10 @@ public class View implements Observer {
         
         dialog2.setPreferredSize(new Dimension(400, 300));
         dialog2.add(Epanel, BorderLayout.CENTER);
+        dialog2.add(subPanel,BorderLayout.SOUTH);
         dialog2.add(lb, BorderLayout.NORTH);
         dialog2.pack();
-        dialog2.setLocation(300, 200);
+        dialog2.setLocation(600, 300);
         dialog2.setTitle("Edit personal alarm");
         dialog2.setVisible(true);
     }

@@ -116,8 +116,7 @@ public class Model<T> extends Observable implements PriorityQueue<T> {
     
     @Override
     public String toString() {
-        String result = "size:"+size();
-        result += ", contents = [";
+        String result = "[";
                 for(Nodes<T> node = top; node != null; node = node.getNext())
                 {
                     if(node != top)
@@ -125,7 +124,9 @@ public class Model<T> extends Observable implements PriorityQueue<T> {
                     result += ", [";
                     }
                     result += node.getHour();
+                    result += ":";
                     result += node.getMinute();
+                    result += ":";
                     result += node.getSecond();
                     result += "]";
                 }
