@@ -19,10 +19,9 @@ public class Model<T> extends Observable implements PriorityQueue<T> {
     
     int oldSecond = 0;
     
-    private int hourtime;
-    private int minutetime;
-    private int secondtime;
-    private int sizeresult = 0;
+    int hourtime;
+    int minutetime;
+    int secondtime;
     
     private Nodes<T> top;
     
@@ -41,6 +40,11 @@ public class Model<T> extends Observable implements PriorityQueue<T> {
             setChanged();
             notifyObservers();
         }
+//        String am_pm;
+//        if(date.get(Calendar.AM_PM)==0)
+//        am_pm="AM";
+//        else
+//        am_pm="PM";
     }
     
     //logic for playing a alarm which is held in controller once the set alarm has been reached
@@ -54,11 +58,7 @@ public class Model<T> extends Observable implements PriorityQueue<T> {
         //issue with linking this timer to the controller class due to static errors.
         //timer.schedule(Controller.alarm(),alarmTime);
     }
-    
-    public void changeText() {
         
-    }
-    
     public int getHour(){
         return hourtime;
     }
@@ -83,11 +83,28 @@ public class Model<T> extends Observable implements PriorityQueue<T> {
         this.secondtime = second;
     }
     
-       //function used to determine the size of the list
+//    public void removeNode(){
+//        Nodes<T> previous = top;
+//        Nodes<T> current = top.next;
+//        Nodes<T> highestPriority = top;
+//        while(current != null)
+//        {
+//            if (current.index > previous.index)
+//            {
+//                top = previous;
+//                highestPriority = current;
+//            }
+//
+//            previous = current;
+//            current = current.next;
+//        }
+//    }
+    
    @Override
     public int size()
     {
         Nodes<T> node = top;
+        int sizeresult = 0;
         while(node != null)
         {
             sizeresult = sizeresult + 1;

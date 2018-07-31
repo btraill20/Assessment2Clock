@@ -1,8 +1,8 @@
 package clock;
 
-import java.applet.*;
 import javax.sound.sampled.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.net.URL;
 import javax.swing.Timer;
 
@@ -20,6 +20,8 @@ public class Controller {
     AudioInputStream audioInputStream;
     Clip clip;
     
+    boolean alarmOn = false;
+    
     public Controller(Model m, View v) {
         model = m;
         view = v;
@@ -28,17 +30,17 @@ public class Controller {
             @Override
             public void actionPerformed(ActionEvent e) {
                 model.update();
+                try {
+                    alarm();
+                } catch (QueueUnderflowException ex) {
+                }
             }
         };
         
         timer = new Timer(100, listener);
         timer.start();
+        
     }
-    
-    //used to update labels, example would be the size of the queue
-    public void updateView(){				
-        model.changeText();
-    }	
     
     public void setHour(int hour){
         model.setHour(hour);		
@@ -63,26 +65,39 @@ public class Controller {
     public int getSecond(){
         return model.getSecond();		
     }
-    
-    public void alarmtime(){
-    for(int i = 0; i< 10; i++) {
-    try {
-        Thread.sleep(1000);
-    } catch(InterruptedException ie) {}
-        alarm();
-    }
-    }
 
+    public final void alarm() throws QueueUnderflowException{
+        final int h = model.hour;
+        final int ht = model.hourtime;
+        final int m = model.minute;
+        final int mt = model.minutetime;
+        final int s = model.second;
+        final int st = model.secondtime;
+//        Timer timer2 = new Timer(){
+//            public void run(){
+//                if (h == ht && m == mt && s == st)
+//                    alarmOn = true;
+//
+//            }
+//        };         
+    }         
     //used to play an alarm
-    public void alarm(){
-        URL url = getClass().getResource("/Audio/alarmaudio.wav");
-        AudioClip clip = Applet.newAudioClip(url);
-        for(int i = 0; i< 10; i++) {
-            try {
-                clip.play();
-                Thread.sleep(5000);
-            } catch(InterruptedException ie) {}
-                clip.stop();
-            }
-        }   
+    public void playalarm() throws QueueUnderflowException{
+        if(alarmOn == true){
+        try{  
+        view.EditDialog();
+        URL url = this.getClass().getClassLoader().getResource("../Audio/alarmaudio.wav");
+        AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
+        Clip clip = AudioSystem.getClip();
+        clip.open(audioIn);
+        this.clip.start();
+        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
+            e.printStackTrace();
+        }
+        }
+        }
+    
+    public void stopalarm(){
+        this.clip.stop();
+    }
 }

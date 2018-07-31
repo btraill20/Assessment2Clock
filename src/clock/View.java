@@ -22,7 +22,6 @@ public class View implements Observer {
     int priority = 0;
     
     public View(Model model) {
-        //set list size to 24 for the hours in a single day
         q = new Model<>(24);
         JFrame frame = new JFrame();
         panel = new ClockPanel(model);
@@ -132,24 +131,23 @@ public class View implements Observer {
         //sets up a panel for the label to show the amount of saved alarms
         JPanel labelpane = new JPanel();
         labelpane.setBorder(BorderFactory.createLineBorder(Color.black));
-        l = new JLabel("Number of saved alarms:0"); 
+        l = new JLabel("Number of saved alarms:"+q.size());
         l.setFont(new Font("Courier New", Font.ITALIC, 12));
         l.setPreferredSize(new Dimension(175, 50));
         l.setForeground(Color.blue);
         labelpane.add(l);
         pane.add(labelpane,BorderLayout.SOUTH);
-        
-    ActionListener actionListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            //current issue with this, seems to repeat in a loop without stopping.
-            l.setText("Number of saved alarms:"+q.size());
-        }
-    }; 
-    Timer timer = new Timer(1000, actionListener);
-    timer.start();
-        
-        
+
+        ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                //current issue with this, seems to repeat in a loop without stopping.
+                l.setText("Number of saved alarms:"+q.size());
+            }
+        }; 
+        Timer timer = new Timer(1000, actionListener);
+        timer.start();
+                      
         //makes the frame visible and location
         frame.setLocation(100, 100);
         frame.pack();
@@ -248,11 +246,12 @@ public class View implements Observer {
         dialog2.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog2.setModal(true);
         
-        DefaultListModel<String> model = new DefaultListModel<>();
+        final DefaultListModel<String> model = new DefaultListModel<>();
         model.addElement(q.toString());
-        JList<String> list = new JList<>(model);
+        final JList<String> list = new JList<>(model);
         
         list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        list.setSelectedIndex(0);
         list.setLayoutOrientation(JList.VERTICAL);
         list.setVisibleRowCount(5);
         list.setPreferredSize(new Dimension(200, 100));
@@ -288,6 +287,11 @@ public class View implements Observer {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 try {
+                    int index = list.getSelectedIndex();
+                    if(index >= 0){
+                        model.removeElementAt(index);
+                    }
+                    list.getSelectedValue();
                     q.remove();
                 } catch (QueueUnderflowException e) {
                     System.out.println("Can't remove head of queue"+e);
@@ -369,24 +373,10 @@ public class View implements Observer {
                 System.out.println("Adding " + alarm.getHour() + ":" + alarm.getMinute() + ":" + alarm.getSecond() + " with priority " + priority);
                 try {
                     q.add(hour,minute,second,priority);
-//                    innerdialog.dispose();
+                    innerdialog.dispose();
                 } catch (QueueOverflowException e) {
                     System.out.println("Add operation failed: " + e);
                 }
-            }
-        });
-            
-        //adds a close button
-        JButton closeButton  = new JButton("Cancel");
-        closeButton.setBackground(new Color(59, 89, 182));
-        closeButton.setForeground(Color.WHITE);
-        closeButton.setFont(new Font("Courier New", Font.PLAIN, 12));
-        pane.add(closeButton, BorderLayout.SOUTH);
-        closeButton.setPreferredSize(new Dimension(150, 50));
-        closeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                innerdialog.dispose();
             }
         });
         
