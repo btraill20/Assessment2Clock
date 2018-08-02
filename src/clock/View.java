@@ -7,6 +7,8 @@ import java.awt.event.InputEvent;
 import javax.swing.*;
 import java.util.Observer;
 import java.util.Observable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
 *view is the visual representation of data that the model contains as well as what the user sees.
@@ -357,8 +359,24 @@ public class View implements Observer {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-
-     
+                Object o1 = hspinner.getValue();
+                Object o2 = mspinner.getValue();
+                Object o3 = sspinner.getValue();
+                Number n1 = (Number) o1;
+                Number n2 = (Number) o2;
+                Number n3 = (Number) o3;
+                int hour = n1.intValue();
+                int minute = n2.intValue();
+                int second = n3.intValue();
+                Alarms alarm = new Alarms(hour,minute,second);
+                priority = priority +1;
+                System.out.println("Adding " + alarm.getHour() + ":" + alarm.getMinute() + ":" + alarm.getSecond() + " with priority " + priority);
+                try {
+                    q.add(hour,minute,second,priority);
+//                    dialog.dispose();
+                } catch (QueueOverflowException e) {
+                    System.out.println("Add operation failed: " + e);
+                }
             }
         });
         innerdialog.setPreferredSize(new Dimension(300, 250));
@@ -375,12 +393,19 @@ public class View implements Observer {
     public void alarmdialog(){
         JPanel alarmp = new JPanel();
         final JDialog Adialog = new JDialog();
-        lb = new Label("Your alarm!!");
+        lb = new Label ("Your alarm!!");
+        lb.setFont(new Font("Courier New", Font.ITALIC, 24));
         Adialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         Adialog.setModal(true);
  
+        
         Timer timer = new Timer(5000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                try {
+                    q.remove();
+                } catch (QueueUnderflowException ex) {
+                    Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 Adialog.setVisible(false);
                 Adialog.dispose();
             }
@@ -388,11 +413,11 @@ public class View implements Observer {
         timer.setRepeats(false);
         timer.start();
         
-        Adialog.setPreferredSize(new Dimension(300, 250));
+        Adialog.setPreferredSize(new Dimension(170, 100));
         Adialog.add(alarmp, BorderLayout.CENTER);
         Adialog.add(lb, BorderLayout.CENTER);
         Adialog.pack();
-        Adialog.setLocation(500, 200);
+        Adialog.setLocation(700, 200);
         Adialog.setTitle("Alarm Popup");
         Adialog.setVisible(true);
     }

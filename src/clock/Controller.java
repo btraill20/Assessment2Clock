@@ -9,10 +9,10 @@ import javax.swing.Timer;
 /*acts on both view and model and controls data flow into 
 *model objects while updateing the view, keeps both model and view seperate.
 */
-public class Controller {
+public class Controller<T> {
     
-    ActionListener listener;
-    Timer timer;
+    ActionListener listener, listenerA;
+    Timer timer, timerA;
     
     Model model;
     View view;
@@ -21,19 +21,19 @@ public class Controller {
     Clip clip;
     
     boolean alarmOn = false;
+    private Nodes<T> top;
     
-    public Controller(Model m, View v) {
+    public Controller(Model m, View v) throws QueueUnderflowException {
         model = m;
         view = v;
+        
+        alarm();
         
         listener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 model.update();
-                try {
-                    alarm();
-                } catch (QueueUnderflowException ex) {
-                }
+                
             }
         };
         
@@ -41,45 +41,34 @@ public class Controller {
         timer.start();
         
     }
-    
-    public void setHour(int hour){
-        model.setHour(hour);		
-    }
 
-    public int getHour(){
-        return model.getHour();		
-    }
-   
-    public void setMinute(int minute){
-        model.setMinute(minute);		
-    }
 
-    public int getMinute(){
-        return model.getMinute();		
-    }
-    
-    public void setSecond(int second){
-        model.setSecond(second);		
-    }
-
-    public int getSecond(){
-        return model.getSecond();		
-    }
 
     public final void alarm() throws QueueUnderflowException{
-        final int h = model.hour;
-        final int ht = model.hourtime;
-        final int m = model.minute;
-        final int mt = model.minutetime;
-        final int s = model.second;
-        final int st = model.secondtime;     
-        Timer timerA = new Timer(1000, new ActionListener() {
+        for(Nodes<T> node = top; node != null; node = node.getNext()){
+            final int ht = node.getHour();
+            final int mt = node.getMinute();
+            final int st = node.getSecond();
+            final int h = model.hour;
+            final int m = model.minute;
+            final int s = model.second; 
+            listenerA = new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {          
-                if (h == ht && m == mt && s == st)
+                if (h == ht && m == mt && s == st){
                     alarmOn = true;
-
-            }
-        });timerA.start();
+                    try {
+                        playalarm();
+                        view.alarmdialog();
+                    } catch (QueueUnderflowException ex) {
+                    }
+                    
+                }
+                }
+            };
+        timerA = new Timer(100, listenerA);
+        timerA.start(); 
+        }
     }         
     //used to play an alarm
     public void playalarm() throws QueueUnderflowException{
@@ -92,12 +81,7 @@ public class Controller {
             clip.open(audioIn);
             this.clip.start();
             } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
-                e.printStackTrace();
             }
         }
-    }
-    
-    public void stopalarm(){
-        this.clip.stop();
     }
 }
