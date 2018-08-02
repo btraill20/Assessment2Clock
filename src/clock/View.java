@@ -228,7 +228,7 @@ public class View implements Observer {
             }
         });
             
-        dialog.setPreferredSize(new Dimension(300, 300));
+        dialog.setPreferredSize(new Dimension(230, 220));
         dialog.add(SApanel, BorderLayout.CENTER);
         dialog.add(lb, BorderLayout.NORTH);
         dialog.pack();
@@ -357,29 +357,10 @@ public class View implements Observer {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                Object o1 = hspinner.getValue();
-                Object o2 = mspinner.getValue();
-                Object o3 = sspinner.getValue();
-                Number n1 = (Number) o1;
-                Number n2 = (Number) o2;
-                Number n3 = (Number) o3;
-                int hour = n1.intValue();
-                int minute = n2.intValue();
-                int second = n3.intValue();
-                Alarms alarm = new Alarms(hour,minute,second);
-                //need to review priority increment as it sets all alarms at priority 1
-                int Pvalue = 0;
-                int priority = ++Pvalue;
-                System.out.println("Adding " + alarm.getHour() + ":" + alarm.getMinute() + ":" + alarm.getSecond() + " with priority " + priority);
-                try {
-                    q.add(hour,minute,second,priority);
-                    innerdialog.dispose();
-                } catch (QueueOverflowException e) {
-                    System.out.println("Add operation failed: " + e);
-                }
+
+     
             }
         });
-        
         innerdialog.setPreferredSize(new Dimension(300, 250));
         innerdialog.add(pane, BorderLayout.CENTER);
         innerdialog.add(lb, BorderLayout.NORTH);
@@ -388,6 +369,32 @@ public class View implements Observer {
         innerdialog.setLocation(500, 200);
         innerdialog.setTitle("Edit Personal Alarm");
         innerdialog.setVisible(true);
+    }
+    
+        //inner dialog for changing alarms already made.
+    public void alarmdialog(){
+        JPanel alarmp = new JPanel();
+        final JDialog Adialog = new JDialog();
+        lb = new Label("Your alarm!!");
+        Adialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        Adialog.setModal(true);
+ 
+        Timer timer = new Timer(5000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Adialog.setVisible(false);
+                Adialog.dispose();
+            }
+        });
+        timer.setRepeats(false);
+        timer.start();
+        
+        Adialog.setPreferredSize(new Dimension(300, 250));
+        Adialog.add(alarmp, BorderLayout.CENTER);
+        Adialog.add(lb, BorderLayout.CENTER);
+        Adialog.pack();
+        Adialog.setLocation(500, 200);
+        Adialog.setTitle("Alarm Popup");
+        Adialog.setVisible(true);
     }
    
 }

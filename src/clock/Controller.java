@@ -72,30 +72,30 @@ public class Controller {
         final int m = model.minute;
         final int mt = model.minutetime;
         final int s = model.second;
-        final int st = model.secondtime;
-//        Timer timer2 = new Timer(){
-//            public void run(){
-//                if (h == ht && m == mt && s == st)
-//                    alarmOn = true;
-//
-//            }
-//        };         
+        final int st = model.secondtime;     
+        Timer timerA = new Timer(1000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {          
+                if (h == ht && m == mt && s == st)
+                    alarmOn = true;
+
+            }
+        });timerA.start();
     }         
     //used to play an alarm
     public void playalarm() throws QueueUnderflowException{
         if(alarmOn == true){
-        try{  
-        view.EditDialog();
-        URL url = this.getClass().getClassLoader().getResource("../Audio/alarmaudio.wav");
-        AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
-        Clip clip = AudioSystem.getClip();
-        clip.open(audioIn);
-        this.clip.start();
-        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
-            e.printStackTrace();
+            try{  
+            view.alarmdialog();
+            URL url = this.getClass().getClassLoader().getResource("/Audio/alarmaudio.wav");
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioIn);
+            this.clip.start();
+            } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
+                e.printStackTrace();
+            }
         }
-        }
-        }
+    }
     
     public void stopalarm(){
         this.clip.stop();
